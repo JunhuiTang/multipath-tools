@@ -199,7 +199,10 @@ void * uxsock_listen(uxsock_trigger_fn uxsock_trigger, void * trigger_data)
 		poll_count = ppoll(polls, i, &sleep_time, &mask);
 
 		if (poll_count == -1) {
+			condlog(3, "uxsock: polling interrupted with %d",
+				errno);
 			if (errno == EINTR) {
+				condlog(3, "uxsock: handling signals");
 				handle_signals();
 				continue;
 			}
@@ -227,7 +230,7 @@ void * uxsock_listen(uxsock_trigger_fn uxsock_trigger, void * trigger_data)
 				}
 				pthread_mutex_unlock(&client_lock);
 				if (!c) {
-					condlog(3, "cli%d: invalid fd %d",
+					condlog(3, "cli%d: invalid fd %d, client died",
 						i, polls[i].fd);
 					continue;
 				}
@@ -268,5 +271,6 @@ void * uxsock_listen(uxsock_trigger_fn uxsock_trigger, void * trigger_data)
 
 	pthread_cleanup_pop(1);
 	close(ux_sock);
+	condlog(0, "uxsock: terminating");
 	return NULL;
 }

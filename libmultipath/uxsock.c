@@ -75,6 +75,7 @@ int ux_socket_listen(const char *name)
 		condlog(3, "using fd %d from sd_listen_fds", fd);
 		return fd;
 	}
+	condlog(1, "No fd from sd_listen_fds, continuing");
 #endif
 	fd = socket(AF_LOCAL, SOCK_STREAM, 0);
 	if (fd == -1) {
